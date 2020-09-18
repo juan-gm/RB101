@@ -1,0 +1,64 @@
+
+inputs:
+  the loan amount
+  Annual Percentage Rate
+  loan duration... months and years, then converted to months
+
+
+outputs:
+  monthly interest rate 
+  loan duration in months
+  monthly payment
+
+Sabemos que el monthly payment viene de la siguiente fórmula:
+m = p * (j / (1 - (1 + j)**(-n)))
+
+m = monthly payment??
+p = loan amount
+j = monthly interest rate?? --> APR / 12
+n = loan duration in months
+
+APR must be converted into a monthly interest rate
+
+
+Test cases
+(10000, 5, 8 months) ---> (??,8, 1273.03)
+
+Edge cases:
+  - Loan amount > 0
+  - APR > 0.. >1??
+  - Loan duration. Years must be an int >= 0, and
+  monts the same. But if years are 0, monts can't
+  be zero too! Maybe they should be less than 12, but
+  that is not 100% neccesary.
+
+Data structure
+Basically, now I just have to calculate every element of
+the formula and then just apply the formula to get
+the monthly payments.
+We have to be careful with the float/integer numbers, as
+it is probable that the user info will be int.
+
+So now algorithm! The most interesting part.
+First, ask for the data input:
+  - The total loan amount
+  - APR, as a percentage
+  - Loan duration. First ask how many years and then
+  how many months. After it must be converted to 
+  months only.
+
+Second, calculate the missing parts of the equation,
+which are also required output for our program:
+  - The monthly interest rate, which is just APR / 12
+  - The loan duration in months, which we calculate
+  very easily from the loan duration.
+
+Finally, we just have to calculate the monthly payment
+applying the formula, and print/output the required
+results.
+
+
+
+
+
+
