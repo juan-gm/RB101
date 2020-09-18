@@ -1,0 +1,74 @@
+A method that returns the sum of two integers
+----------------------------------------------
+Given two integers
+  Sum them and store the result
+  Return the result
+--------------------------------------------
+START
+
+#Given two numbers called n1 and n2
+
+SET result = n1 +n2
+RETURN result
+
+END
+
+***********************************************
+A method that takes an array of strings, 
+and returns a string that is all those 
+strings concatenated together
+
+---------------------------------------------
+Given an array of strings
+
+Create the string that is going to be the result
+Iterate throug the array
+Add each string in the array to the result
+Return the result
+---------------------------
+START
+
+#Given an array of words "strings"
+SET ITERATOR = 0
+SET result = ''
+WHILE iterator < strings
+  READ current word in strings
+  SET result to result + words
+  iterator = iterator + 1
+
+PRINT result
+END
+
+***************************************************
+
+a method that takes an array of integers, 
+and returns a new array with every other element
+
+---------------------------------
+Given an array of integers
+Create the new array that is the result
+Iterate through the array:
+  First integer, push it to result
+  Second integer, don't
+  Third push
+  ... and so on
+Return the result
+
+----------------------------------------
+
+START
+#Given an array of integers called "ints"
+
+ 
+SET result = []
+SET iterator = 0
+
+WHILE iterator < ints.length
+  IF iterator%2 == 0
+    push int into result
+  ELSE
+    next
+end
+PRINT result
+END
+
