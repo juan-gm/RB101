@@ -8,29 +8,32 @@ def valid?(input)
     (input.to_f > 0.0)
 end
 
-loop do
-  prompt("Welcome to this fantastic mortgage calculator!")
-
+def retrieve_loan_amount
   loan_amount = ''
-  annual_percentage_rate = ''
-  years = ''
-  months = ''
-
   loop do
     prompt("First, I need to know the total loan amount")
     loan_amount = gets.chomp
     break if (!loan_amount.empty?) && (valid?(loan_amount))
     prompt("Please, introduce a non-zero positive number")
   end
+  loan_amount
+end
 
+def retrieve_apr_amount
+  apr = ''
   loop do
     prompt("Now, tell me the Annual Percentage Rate in %")
-    annual_percentage_rate = gets.chomp
-    break if (!annual_percentage_rate.empty?) &&
-             (valid?(annual_percentage_rate))
+    apr = gets.chomp
+    break if (!apr.empty?) &&
+             (valid?(apr))
     prompt("Please, introduce a non-zero positive number")
   end
+  apr
+end
 
+def retrieve_duration
+  years = ''
+  months = ''
   prompt("Finally, I need to know the loan duration")
   loop do
     loop do
@@ -48,20 +51,41 @@ loop do
     break if years.to_i + months.to_i != 0
     prompt("Remember that years AND months can't be zero!")
   end
+  years.to_i * 12 + months.to_i
+end
 
+def calculate_monthly_rate(apr)
   prompt("Calculating...")
-  loan_duration_months = years.to_i * 12 + months.to_i
-  monthly_interest_rate = annual_percentage_rate.to_f / 1200
-  monthly_payment = loan_amount.to_f *
-                    (monthly_interest_rate / (1 -
-                    (1 + monthly_interest_rate)**(-loan_duration_months)))
+  apr.to_f / 1200
+end
 
-  monthly_interest_rate *= 100
+def calculate_monthly_payment(loan_amount, monthly_interest_rate, monthly_duration)
+  loan_amount.to_f *
+  (monthly_interest_rate / (1 -
+  (1 + monthly_interest_rate)**(-monthly_duration)))
+end
+
+def display_full_calculation(monthly_interest_rate, monthly_duration, monthly_payment)
   prompt("The monthly interest rate is:
-        #{format('%.2f', monthly_interest_rate)}%")
-  prompt("The loan duration is: #{loan_duration_months} months")
+        #{format('%.2f', monthly_interest_rate*100)}%")
+  prompt("The loan duration is: #{monthly_duration} months")
   prompt("The monthly payments are: #{format('%.2f', monthly_payment)} €")
+end
 
+loop do
+  system("clear")
+  prompt("Welcome to this fantastic mortgage calculator!")
+
+  loan_amount = retrieve_loan_amount
+  apr = retrieve_apr_amount
+  monthly_duration = retrieve_duration
+  
+  
+  monthly_interest_rate = calculate_monthly_rate(apr)
+  monthly_payment = calculate_monthly_payment(loan_amount, monthly_interest_rate, monthly_duration)
+  
+  display_full_calculation(monthly_interest_rate, monthly_duration, monthly_payment)
+  
   prompt("Do you want to perform another calculation?
     Press Y to calculate again")
   answer = gets.chomp
@@ -69,3 +93,4 @@ loop do
 end
 
 prompt("Thank you for using the calculator. Good bye!")
+system("clear")
