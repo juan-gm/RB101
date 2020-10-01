@@ -49,7 +49,7 @@ def joinor(arr, separator = ', ', final = 'or')
   return arr.join(" #{final} ") if arr.size == 2
   final_string = ''
   arr.each_with_index do |item, index|
-    if index < (arr.size - 1) 
+    if index < (arr.size - 1)
       final_string << item.to_s
       final_string << separator
     else
@@ -59,7 +59,6 @@ def joinor(arr, separator = ', ', final = 'or')
   end
   final_string
 end
-
 
 def player_places_piece!(brd)
   square = ''
@@ -195,7 +194,6 @@ def choose_who_plays(possible_options)
   player
 end
 
-
 clear
 score = { player: 0, computer: 0 }
 first_to_play = choose_who_plays(FIRST_PLAYER)
@@ -204,11 +202,11 @@ loop do
   reset_score(score)
   board = initialize_board
   clear
-  if first_to_play == "choose"
-    current_player = choose_who_plays(FIRST_PLAYER[0..1])
-  else
-    current_player = first_to_play
-  end
+  current_player = if first_to_play == "choose"
+                     choose_who_plays(FIRST_PLAYER[0..1])
+                   else
+                     first_to_play
+                   end
 
   loop do
     clear
@@ -226,14 +224,14 @@ loop do
     update_score(score, board)
     info_score(score)
     if (score[:player] != 5) && (score[:computer] != 5)
-      prompt ("Press intro to continue the game")
-      answer = gets.chomp
+      prompt("Press intro to continue the game")
+      gets.chomp
     end
   else
     prompt("It's a tie!")
     info_score(score)
-    prompt ("Press intro to continue the game")
-    answer = gets.chomp
+    prompt("Press intro to continue the game")
+    gets.chomp
   end
 
   grand_winner(score)
