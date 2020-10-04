@@ -18,6 +18,7 @@ end
 # rubocop:disable Metrics/AbcSize
 def display_board(brd)
   puts "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}"
+  puts "First to reach 5 points wins!"
   puts ""
   puts "     |     |"
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}  "
@@ -35,9 +36,7 @@ end
 # rubocop:enable Metrics/AbcSize
 
 def initialize_board
-  new_board = {}
-  (1..9).each { |num| new_board[num] = INITIAL_MARKER }
-  new_board
+  (1..9).each_with_object({}) { |num, board| board[num] = INITIAL_MARKER }
 end
 
 def empty_squares(brd)
@@ -60,15 +59,19 @@ def joinor(arr, separator = ', ', final = 'or')
   final_string
 end
 
+def is_integer?(num)
+  num.to_f - num.to_i == 0.0
+end
+
 def player_places_piece!(brd)
   square = ''
   loop do
     prompt("Choose a square (#{joinor(empty_squares(brd))})")
-    square = gets.chomp.to_i
-    break if empty_squares(brd).include?(square)
+    square = gets.chomp
+    break if empty_squares(brd).include?(square.to_i) && is_integer?(square)
     prompt("Sorry, that's not a valid choice")
   end
-  brd[square] = PLAYER_MARKER
+  brd[square.to_i] = PLAYER_MARKER
 end
 
 def computer_places_piece!(brd)
@@ -130,10 +133,10 @@ def detect_winner(brd)
   nil
 end
 
-def update_score(score, brd)
-  if detect_winner(brd) == 'Player'
+def update_score(score, brd, winner)
+  if winner == 'Player'
     score[:player] += 1
-  elsif detect_winner(brd) == 'Computer'
+  elsif winner == 'Computer'
     score[:computer] += 1
   end
 end
@@ -156,7 +159,7 @@ def continue?(score)
   loop do
     prompt("Do you want another match? " + VALID_YES_NO_INPUTS.join(', '))
     answer = gets.chomp
-    if VALID_YES_NO_INPUTS.include?(answer)
+    if VALID_YES_NO_INPUTS.include?(answer.downcase)
       return answer.downcase.start_with?('y')
     else
       prompt("Please include a valid input")
@@ -194,6 +197,13 @@ def choose_who_plays(possible_options)
   player
 end
 
+def pause_game(score)
+  if (score[:player] != 5) && (score[:computer] != 5)
+    prompt("Press enter to continue the game")
+    gets.chomp
+  end
+end
+
 clear
 score = { player: 0, computer: 0 }
 first_to_play = choose_who_plays(FIRST_PLAYER)
@@ -220,17 +230,15 @@ loop do
   display_board(board)
 
   if someone_won?(board)
-    prompt("#{detect_winner(board)} won!")
-    update_score(score, board)
+    winner = detect_winner(board)
+    prompt("#{winner} won!")
+    update_score(score, board, winner)
     info_score(score)
-    if (score[:player] != 5) && (score[:computer] != 5)
-      prompt("Press intro to continue the game")
-      gets.chomp
-    end
+    pause_game(score)
   else
     prompt("It's a tie!")
     info_score(score)
-    prompt("Press intro to continue the game")
+    prompt("Press enter to continue the game")
     gets.chomp
   end
 
