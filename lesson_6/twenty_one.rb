@@ -2,6 +2,8 @@ SUITS = %w(Hearts Diamonds Clubs Spades)
 VALUES = %w(Ace 2 3 4 5 6 7 8 9 10 Jack Queen King)
 DECK = VALUES.product(SUITS)
 VALID_YES_NO_INPUTS = %w(yes y no n)
+DEALER_MAX = 17
+MAX_TOTAL = 21
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -27,34 +29,54 @@ def joinor(arr, separator = ', ', final = 'and')
   final_string
 end
 
-def deal_cards(shuffled_deck, player_deck, dealer_deck)
+def display_welcome
+  clear
+  prompt("Welcome to twenty-one game!")
+  prompt("Press enter to play")
+  gets.chomp
+end
+
+def display_goodbye
+  clear
+  puts "Thanks for playing!"
+end
+
+def initialize_deck
+  DECK.shuffle
+end
+
+def initial_deal_cards(shuffled_deck, player_deck, dealer_deck)
   2.times do
     player_deck << shuffled_deck.pop
     dealer_deck << shuffled_deck.pop
   end
 end
 
-def show_info(player_cards, dealer_cards)
+def display_hands_with_unknown(player_cards, dealer_cards)
   prompt("Dealer has: #{dealer_cards[0][0]} and unknown card")
   values_of_player_cards = []
   player_cards.each { |card| values_of_player_cards << card[0] }
-  prompt("You have: #{joinor(values_of_player_cards)}")
+  player_total = total(player_cards)
+  prompt("You have: #{joinor(values_of_player_cards)}, so a total of #{player_total}")
 end
 
-def show_full_info(player_cards, dealer_cards)
+def display_full_hands(player_cards, dealer_cards)
   values_of_dealer_cards = []
   dealer_cards.each { |card| values_of_dealer_cards << card[0] }
-  prompt("Dealer has: #{joinor(values_of_dealer_cards)}")
+  dealer_total = total(dealer_cards)
+  prompt("Dealer has: #{joinor(values_of_dealer_cards)}, so a total of #{dealer_total}")
+  
   values_of_player_cards = []
   player_cards.each { |card| values_of_player_cards << card[0] }
-  prompt("You have: #{joinor(values_of_player_cards)}")
+  player_total = total(player_cards)
+  prompt("You have: #{joinor(values_of_player_cards)}, so a total of #{player_total}")
 end
 
 def player_turn(player_cards, dealer_cards, shuffled_deck)
   loop do
-    show_info(player_cards, dealer_cards)
+    display_hands_with_unknown(player_cards, dealer_cards)
     puts "hit or stay?"
-    answer = gets.chomp
+    answer = gets.chomp.downcase
     if answer != 'hit' && answer != 'stay'
       puts "Only hit or stay are valid"
       next
@@ -67,7 +89,7 @@ end
 
 def player_result(player_cards, dealer_cards)
   if busted?(player_cards)
-    show_info(player_cards, dealer_cards)
+    display_hands_with_unknown(player_cards, dealer_cards)
     puts "Sorry, you busted!"
   else
     puts "You chose to stay!"
@@ -75,14 +97,17 @@ def player_result(player_cards, dealer_cards)
 end
 
 def dealer_turn(dealer_cards, shuffled_deck)
-  while total(dealer_cards) < 17
+  puts "Now is the dealer's turn"
+  puts "---------------------------------"
+  while total(dealer_cards) < DEALER_MAX
     dealer_cards << shuffled_deck.pop
   end
   puts "Dealer busted!" if busted?(dealer_cards)
+  puts "The dealer has completed its turn"
 end
 
 def busted?(cards)
-  total(cards) > 21
+  total(cards) > MAX_TOTAL
 end
 
 def total(cards)
@@ -99,17 +124,20 @@ def total(cards)
            end
   end
 
-  # correct for Aces
+  correct_for_aces(values, sum)
+end
+
+def correct_for_aces(values, sum)
   values.select { |value| value.start_with?("A") }.count.times do
-    sum -= 10 if sum > 21
+    sum -= 10 if sum > MAX_TOTAL
   end
   sum
 end
 
 def declare_winner(total_player, total_dealer)
-  if total_player > 21
+  if total_player > MAX_TOTAL
     prompt("You busted, so the dealer wins!")
-  elsif total_dealer > 21
+  elsif total_dealer > MAX_TOTAL
     prompt("The dealer busted, so you win!")
   else
     champion = winner(total_player, total_dealer)
@@ -143,25 +171,23 @@ def continue?
   end
 end
 
+display_welcome
+
 loop do
   clear
-  prompt("Welcome to twenty-one game!")
-  shuffled_deck = DECK.shuffle
+  shuffled_deck = initialize_deck
 
   player_cards = []
   dealer_cards = []
   loop do
-    deal_cards(shuffled_deck, player_cards, dealer_cards)
+    initial_deal_cards(shuffled_deck, player_cards, dealer_cards)
 
     player_turn(player_cards, dealer_cards, shuffled_deck)
 
-    break if total(player_cards) > 21
-    puts "Now is the dealer's turn"
-    puts "---------------------------------"
+    break if busted?(player_cards)
+    
     dealer_turn(dealer_cards, shuffled_deck)
-    puts "The dealer has completed its turn"
-    show_full_info(player_cards, dealer_cards)
-
+    display_full_hands(player_cards, dealer_cards)
     break
   end
   total_player = total(player_cards)
@@ -173,4 +199,5 @@ loop do
   break if !continue?
 end
 
-puts "Thanks for playing!"
+display_goodbye
+
